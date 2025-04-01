@@ -37,5 +37,6 @@ for post in content["paginatedPosts"]["posts"]:
     content      = soup.find(name="div", id="content-blocks")
     fe.content(content=str(content))
 
-fg.atom_file('atom.xml') # Write the ATOM feed to a file
-fg.rss_file('rss.xml') # Write the RSS feed to a file
+# Write atom/rss to files
+fg.atom_file("atom.xml")
+fg.rss_file("rss.xml")
