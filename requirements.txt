@@ -1,4 +1,3 @@
 httpx
-json
 beautifulsoup4
 feedgen
