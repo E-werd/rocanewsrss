@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+import httpx, json
+from feedgen.feed import FeedGenerator
+from bs4 import BeautifulSoup
+
+def start() -> None:
+    # Get JSON from RocaNews
+    response = httpx.get("https://thecurrent.rocanews.com/?_data=routes/index")
+    content  = json.loads(response.text)
+    
+    # Instantiate feed object, set feed info
+    fg: FeedGenerator = FeedGenerator()
+    fg.id(id=content["publication"]["id"])
+    fg.title(title=content["metaTitle"])
+    fg.description(description=content["metaDescription"])
+    fg.link(href=content["publication"]["url"], rel="alternate")
+    fg.image(url=content["publication"]["logo"]["url"], link=content["publication"]["url"], title=content["metaTitle"])
+    fg.language(language="en")
+    
+    # Get posts
+    for post in content["paginatedPosts"]["posts"]:
+        # Generate link, we'll need this for the post link and to get content
+        link = "https://thecurrent.rocanews.com/p/" + post["slug"]
+
+        # Build the feed entry
+        fe = fg.add_entry()
+        fe.guid(guid=post["id"])
+        fe.title(title=post["meta_default_title"])
+        fe.description(description=post["meta_default_description"])
+        fe.link(href=link)
+        fe.published(published=post["created_at"])
+        fe.updated(updated=post["updated_at"])
+
+        # Fetch the content and populate the post
+        response     = httpx.get(link)
+        full_content = response.text
+        soup         = BeautifulSoup(full_content, "html.parser")
+        content      = soup.find(name="div", id="content-blocks")
+        fe.content(content=str(content))
+
+    fg.atom_file('atom.xml') # Write the ATOM feed to a file
+    fg.rss_file('rss.xml') # Write the RSS feed to a file
+
+start()
