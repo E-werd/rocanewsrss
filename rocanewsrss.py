@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import httpx, json
+import httpx, json, datetime
 from feedgen.feed import FeedGenerator
 from bs4 import BeautifulSoup
 
@@ -15,6 +15,9 @@ fg.description(description=content["metaDescription"])
 fg.link(href=content["publication"]["url"], rel="alternate")
 fg.image(url=content["publication"]["logo"]["url"], link=content["publication"]["url"], title=content["metaTitle"])
 fg.language(language="en")
+
+cp = "© " + str(datetime.datetime.now().year) + " " + content["publication"]["copyright_text"]
+fg.copyright(copyright=cp)
 
 # Get posts
 for post in content["paginatedPosts"]["posts"]:
