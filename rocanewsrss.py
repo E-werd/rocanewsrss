@@ -38,5 +38,12 @@ for post in content["paginatedPosts"]["posts"]:
     fe.content(content=str(content))
 
 # Write atom/rss to files
-fg.atom_file("atom.xml")
-fg.rss_file("rss.xml")
+bs = BeautifulSoup(fg.rss_str(), 'xml')
+pretty_rss = bs.prettify()
+with open("rss.xml", "w") as rss_file:
+    rss_file.write(str(pretty_rss))
+
+bs = BeautifulSoup(fg.atom_str(), 'xml')
+pretty_atom = bs.prettify()
+with open("atom.xml", "w") as atom_file:
+    atom_file.write(str(pretty_atom))
